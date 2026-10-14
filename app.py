@@ -1,5 +1,4 @@
 import inspect
-from pathlib import Path
 
 import joblib
 import numpy as np
@@ -11,28 +10,12 @@ st.set_page_config(page_title="Modelo de consumo", page_icon="⚡")
 # ------------------------------------------------------------------
 # Cargar el modelo entrenado en el Colab
 # ------------------------------------------------------------------
-CARPETA = Path(__file__).parent
-
-
 @st.cache_resource
 def cargar_modelo():
-    return joblib.load(CARPETA / "modelo_consumo.joblib")
+    return joblib.load("modelo_consumo.joblib")
 
 
-try:
-    flujo = cargar_modelo()
-except ModuleNotFoundError as e:
-    st.error(f"No se pudo cargar el modelo: falta el módulo **{e.name}**.")
-    if e.name and e.name.startswith("energia_ml"):
-        st.write("El modelo necesita la carpeta `energia_ml/` (con sus 4 archivos .py) junto a `app.py`.")
-    elif e.name and e.name.startswith("numpy"):
-        st.write(f"El modelo se guardó con NumPy 2, pero aquí está instalado NumPy {np.__version__}. "
-                 "Revisa que `requirements.txt` diga `numpy>=2.0,<3.0`.")
-    st.write("Archivos que la app encuentra en el repositorio:")
-    st.code("\n".join(sorted(str(p.relative_to(CARPETA)) for p in CARPETA.rglob("*")
-                             if ".git" not in p.parts)))
-    st.stop()
-
+flujo = cargar_modelo()
 pre = flujo.preprocesador
 modelo = flujo.modelo
 COLUMNAS = ["temperatura", "ocupacion", "humedad"]
